@@ -1,10 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -15,9 +10,9 @@ namespace Log_system.Services
         private string _source;
         public string _response { get; set; }
 
-        public HttpClient(IConfiguration config)
+        public HttpClient(IConfiguration configuration)
         {
-            _source = config["DataUrl"];
+            _source = configuration.GetSection("DataUrl").Value;
         }
         public async Task SendGetRequest()
         {
