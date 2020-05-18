@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -17,7 +16,7 @@ namespace Log_system.Services
         public async Task<WebResponse> GetHttpResponseMessage()
         {
             WebRequest request = WebRequest.Create(_source);
-            return await Task.Run( () => request.GetResponseAsync() );
+            return await request.GetResponseAsync();
 
         }
 

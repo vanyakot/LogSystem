@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Log_system.Services.DataConverter
+namespace Log_system.Services
 {
     public class DataConverter : IDataConverter
     {
@@ -13,22 +11,26 @@ namespace Log_system.Services.DataConverter
 
         private WebResponse response;
 
+        private string json;
+
+
         public DataConverter(IHttpClient client)
         {
             _client = client;
         }
 
-        public T WebResponseToObj<T>()
+        public async Task<T> WebResponseToObj<T>()
         {
-            response = _client.GetHttpResponseMessage();
+            response = await _client.GetHttpResponseMessage();
             using (Stream stream = response.GetResponseStream())
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
-                    reader.ReadToEnd();
+                    json = reader.ReadToEnd();
                 }
             }
             response.Close();
+            return JsonSerializer.Deserialize<T>(json);
 
         }
     }

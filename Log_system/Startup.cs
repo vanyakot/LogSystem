@@ -44,12 +44,13 @@ namespace Log_system
 
         private void CreateHangfireJobs()
         {
-            RecurringJob.AddOrUpdate<Handler>(h => h.ReceiveInfo(), Cron.Minutely);
+            RecurringJob.AddOrUpdate<DataController>(h => h.ReceiveInfo(), Cron.Minutely);
         }
 
         private void ExtensionsServices(IServiceCollection services)
         {
             services.AddTransient<IHttpClient, HttpClient>();
+            services.AddTransient<IDataConverter, DataConverter>();
         }
     }
 }
