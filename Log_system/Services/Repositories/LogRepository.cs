@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 namespace Log_system.Services.Repositories
 {
-    public class LogRepository:ILogRepository
+    public class LogRepository : ILogRepository
     {
-        private string connectionString;
+        private readonly string connectionString;
         public LogRepository(IConfiguration configuration)
         {
             connectionString = configuration.GetConnectionString("LogDB"); ;

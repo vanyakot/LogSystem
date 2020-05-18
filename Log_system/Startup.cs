@@ -24,7 +24,7 @@ namespace Log_system
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("HangfireDB")));
             services.AddHangfireServer();
-            services.AddTransient<IHttpClient, HttpClient>();
+            ExtensionsServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,9 +37,19 @@ namespace Log_system
 
             app.UseHangfireDashboard();
 
-            RecurringJob.AddOrUpdate<Handler>(h => h.ReceiveInfo(), Cron.Minutely);
+            CreateHangfireJobs();
 
             app.UseMvc();
+        }
+
+        private void CreateHangfireJobs()
+        {
+            RecurringJob.AddOrUpdate<Handler>(h => h.ReceiveInfo(), Cron.Minutely);
+        }
+
+        private void ExtensionsServices(IServiceCollection services)
+        {
+            services.AddTransient<IHttpClient, HttpClient>();
         }
     }
 }
