@@ -2,8 +2,8 @@
 
 namespace Log_system.Services
 {
-    public interface IDataConverter
+    public interface IDataClient
     {
-        Task<T> WebResponseToObj<T>();
+        Task<T> GetResponse<T>();
     }
 }

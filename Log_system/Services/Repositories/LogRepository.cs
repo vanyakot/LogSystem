@@ -3,10 +3,10 @@ namespace Log_system.Services.Repositories
 {
     public class LogRepository : ILogRepository
     {
-        private readonly string connectionString;
+        private readonly string _connectionString;
         public LogRepository(IConfiguration configuration)
         {
-            connectionString = configuration.GetConnectionString("LogDB"); ;
+            _connectionString = configuration.GetConnectionString("LogDB"); ;
         }
 
         public void CreateTable()

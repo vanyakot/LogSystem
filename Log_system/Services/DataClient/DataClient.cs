@@ -5,23 +5,20 @@ using System.Threading.Tasks;
 
 namespace Log_system.Services
 {
-    public class DataConverter : IDataConverter
+    public class DataClient : IDataClient
     {
         private readonly IHttpClient _client;
 
-        private WebResponse response;
-
-        private string json;
-
-
-        public DataConverter(IHttpClient client)
+        public DataClient(IHttpClient client)
         {
             _client = client;
         }
 
-        public async Task<T> WebResponseToObj<T>()
+        public async Task<T> GetResponse<T>()
         {
-            response = await _client.GetHttpResponseMessage();
+            string json;
+
+            WebResponse response = await _client.GetHttpResponseMessage();
             using (Stream stream = response.GetResponseStream())
             {
                 using (StreamReader reader = new StreamReader(stream))
@@ -30,6 +27,7 @@ namespace Log_system.Services
                 }
             }
             response.Close();
+
             return JsonSerializer.Deserialize<T>(json);
 
         }

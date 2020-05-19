@@ -1,5 +1,4 @@
 ﻿using Hangfire;
-using Log_system.Data.Receive;
 using Log_system.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,7 +23,7 @@ namespace Log_system
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHangfire(x => x.UseSqlServerStorage(Configuration.GetConnectionString("HangfireDB")));
             services.AddHangfireServer();
-            ExtensionsServices(services);
+            RegisterServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,10 +46,10 @@ namespace Log_system
             RecurringJob.AddOrUpdate<DataController>(h => h.ReceiveInfo(), Cron.Minutely);
         }
 
-        private void ExtensionsServices(IServiceCollection services)
+        private void RegisterServices(IServiceCollection services)
         {
             services.AddTransient<IHttpClient, HttpClient>();
-            services.AddTransient<IDataConverter, DataConverter>();
+            services.AddTransient<IDataClient, DataClient>();
         }
     }
 }

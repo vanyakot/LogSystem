@@ -16,6 +16,7 @@ namespace Log_system.Services
         public async Task<WebResponse> GetHttpResponseMessage()
         {
             WebRequest request = WebRequest.Create(_source);
+
             return await request.GetResponseAsync();
 
         }

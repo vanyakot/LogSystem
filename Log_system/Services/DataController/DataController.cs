@@ -1,21 +1,20 @@
 ﻿using Log_system.Data.Model;
-using Log_system.Services;
 using System.Threading.Tasks;
 
-namespace Log_system.Data.Receive
+namespace Log_system.Services
 {
     public class DataController
     {
-        private readonly IDataConverter _converter;
-        private LogData data;
-        public DataController(IDataConverter converter)
+        private readonly IDataClient _converter;
+
+        public DataController(IDataClient converter)
         {
             _converter = converter;
         }
 
         public async Task ReceiveInfo()
         {
-           data = await _converter.WebResponseToObj<LogData>();
+            LogData data = await _converter.GetResponse<LogData>();
         }
     }
 }
