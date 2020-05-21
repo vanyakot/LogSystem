@@ -50,6 +50,7 @@ namespace Log_system
         {
             services.AddTransient<IHttpClient, HttpClient>();
             services.AddTransient<IDataClient, DataClient>();
+            services.AddTransient<ILogRepository, LogRepository>();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using Log_system.Data.Model;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -28,7 +30,11 @@ namespace Log_system.Services
             }
             response.Close();
 
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonSerializer.Deserialize<T>(json,
+                   new JsonSerializerOptions
+                   {
+                       PropertyNameCaseInsensitive = true
+                   });
 
         }
     }
