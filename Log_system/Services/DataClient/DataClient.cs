@@ -21,21 +21,26 @@ namespace Log_system.Services
             string json;
 
             WebResponse response = await _client.GetHttpResponseMessage();
-            using (Stream stream = response.GetResponseStream())
+            if (response != null)
             {
-                using (StreamReader reader = new StreamReader(stream))
+                using (Stream stream = response.GetResponseStream())
                 {
-                    json = reader.ReadToEnd();
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        json = reader.ReadToEnd();
+                    }
                 }
+                response.Close();
+                return JsonSerializer.Deserialize<T>(json,
+                       new JsonSerializerOptions
+                       {
+                           PropertyNameCaseInsensitive = true
+                       });
             }
-            response.Close();
-
-            return JsonSerializer.Deserialize<T>(json,
-                   new JsonSerializerOptions
-                   {
-                       PropertyNameCaseInsensitive = true
-                   });
-
+            else
+            {
+                return default;
+            }
         }
     }
 }

@@ -20,15 +20,17 @@ namespace Log_system.Services
         public async Task ReceiveInfo()
         {
             LogData data = await _dataClient.GetResponse<LogData>();
-
-            if (data.Error != null)
+            if (data != null)
             {
-                _repository.AddError(data, DateTime.Now);
+                if (data.Error != null)
+                {
+                    _repository.AddError(data, DateTime.Now);
 
-            }
-            else if (data.Warning != null)
-            {
-                _repository.AddWarning(data, DateTime.Now);
+                }
+                else if (data.Warning != null)
+                {
+                    _repository.AddWarning(data, DateTime.Now);
+                }
             }
         }
     }
