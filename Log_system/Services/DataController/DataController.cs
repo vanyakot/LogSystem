@@ -22,14 +22,15 @@ namespace Log_system.Services
             LogData data = await _dataClient.GetResponse<LogData>();
             if (data != null)
             {
+                data.TimeRecieve = DateTime.Now;
                 if (data.Error != null)
                 {
-                    _repository.AddError(data, DateTime.Now);
+                    _repository.AddError(data);
 
                 }
                 else if (data.Warning != null)
                 {
-                    _repository.AddWarning(data, DateTime.Now);
+                    _repository.AddWarning(data);
                 }
             }
         }
