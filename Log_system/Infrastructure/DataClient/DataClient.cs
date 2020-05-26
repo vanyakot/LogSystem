@@ -1,11 +1,12 @@
-﻿using Log_system.Data.Model;
+﻿using Log_system.Infrastucture;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Log_system.Services
+namespace Log_system.Infrastucture
 {
     public class DataClient : IDataClient
     {

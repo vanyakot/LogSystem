@@ -1,5 +1,7 @@
 ﻿using Hangfire;
+using Log_system.Infrastucture;
 using Log_system.Services;
+using Log_system.Services.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -34,8 +36,10 @@ namespace Log_system
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHangfireDashboard();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
+            app.UseHangfireDashboard();
             CreateHangfireJobs();
 
             app.UseMvc();
@@ -43,14 +47,16 @@ namespace Log_system
 
         private void CreateHangfireJobs()
         {
-            RecurringJob.AddOrUpdate<DataController>(h => h.ReceiveInfo(), Cron.Minutely);
+            RecurringJob.AddOrUpdate<DataHandler>(h => h.ReceiveInfo(), Cron.Minutely);
         }
 
         private void RegisterServices(IServiceCollection services)
         {
+            services.AddTransient<ChartHandler>();
             services.AddTransient<IHttpClient, HttpClient>();
             services.AddTransient<IDataClient, DataClient>();
-            services.AddTransient<ILogRepository, LogRepository>();
+            services.AddTransient<IErrorRepository, ErrorRepository>();
+            services.AddTransient<IWarningRepository, WarningRepository>();
         }
     }
 }

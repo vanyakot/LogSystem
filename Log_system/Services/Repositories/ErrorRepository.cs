@@ -1,4 +1,5 @@
 ﻿using Log_system.Data.Model;
+using Log_system.Infrastucture;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -6,17 +7,17 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 
-namespace Log_system.Services
+namespace Log_system.Services.Repositories
 {
-    public class LogRepository : ILogRepository
+    public class ErrorRepository : IErrorRepository
     {
         private readonly string _connectionString;
-        public LogRepository(IConfiguration configuration)
+        public ErrorRepository(IConfiguration configuration)
         {
             _connectionString = configuration.GetConnectionString("LogDB");
         }
 
-        public void AddError(LogData data)
+        public void AddError(LogError data)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -35,14 +36,14 @@ namespace Log_system.Services
 
                     command.Parameters.Add("@hotelId", SqlDbType.Int).Value = data.HotelId;
                     command.Parameters.Add("@error", SqlDbType.NVarChar).Value = data.Error; ;
-                    command.Parameters.Add("@date", SqlDbType.DateTime).Value = data.TimeRecieve;
+                    command.Parameters.Add("@date", SqlDbType.DateTime).Value = data.CreationDateTime;
 
                     command.ExecuteNonQuery();
                 }
             }
         }
 
-        public void AddWarning(LogData data)
+        public void AddErrorWithInfo(LogError data)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -50,27 +51,30 @@ namespace Log_system.Services
                 using (SqlCommand command = connection.CreateCommand())
                 {
                     command.CommandText = @"
-                    INSERT INTO WarningData
+                    INSERT INTO ErrorData
                         (HotelId,
                          Error,
-                         Date)
+                         Date,
+                         AdditionalInfo)
                     VALUES 
                         (@hotelId, 
-                         @warning, 
-                         @date)";
+                         @error, 
+                         @date,
+                         @additionalInfo)";
 
                     command.Parameters.Add("@hotelId", SqlDbType.Int).Value = data.HotelId;
-                    command.Parameters.Add("@warning", SqlDbType.NVarChar).Value = data.Warning; ;
-                    command.Parameters.Add("@date", SqlDbType.DateTime).Value = data.TimeRecieve;
+                    command.Parameters.Add("@error", SqlDbType.NVarChar).Value = data.Error; ;
+                    command.Parameters.Add("@date", SqlDbType.DateTime).Value = data.CreationDateTime;
+                    command.Parameters.Add("@additionalInfo", SqlDbType.NVarChar).Value = data.AdditionalInfo;
 
                     command.ExecuteNonQuery();
                 }
             }
         }
 
-        public List<LogData> FindErrorsById(int HotelId)
+        public List<LogError> FindErrorsByDate(DateTime StartDate, DateTime EndDate)
         {
-            List<LogData> Errors = new List<LogData>();
+            List<LogError> Errors = new List<LogError>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
@@ -80,44 +84,8 @@ namespace Log_system.Services
                         @"SELECT
                             HotelId,
                             Error,
-                            Date
-                        FROM ErrorData
-                        WHERE HotelId = @hotelId";
-
-                    command.Parameters.Add("@hotelId", SqlDbType.Int).Value = HotelId;
-
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var Error = new LogData
-                            {
-                                HotelId = Convert.ToInt32(reader["HotelId"]),
-                                Error = Convert.ToString(reader["Error"]),
-                                TimeRecieve = Convert.ToDateTime(reader["Date"]),
-                            };
-                            Errors.Add(Error);
-                        }
-                    }
-                }
-            }
-
-            return Errors;
-        }
-
-        public List<LogData> FindErrorsByDate(DateTime StartDate, DateTime EndDate)
-        {
-            List<LogData> Errors = new List<LogData>();
-            using (SqlConnection connection = new SqlConnection(_connectionString))
-            {
-                connection.Open();
-                using (SqlCommand command = connection.CreateCommand())
-                {
-                    command.CommandText =
-                        @"SELECT
-                            HotelId,
-                            Error,
-                            Date
+                            Date,
+                            AdditionalInfo
                         FROM ErrorData
                         WHERE Date >= @startDate AND Date <= @endDate";
 
@@ -128,11 +96,12 @@ namespace Log_system.Services
                     {
                         while (reader.Read())
                         {
-                            var Error = new LogData
+                            var Error = new LogError
                             {
                                 HotelId = Convert.ToInt32(reader["HotelId"]),
                                 Error = Convert.ToString(reader["Error"]),
-                                TimeRecieve = Convert.ToDateTime(reader["Date"]),
+                                CreationDateTime = Convert.ToDateTime(reader["Date"]),
+                                AdditionalInfo = Convert.ToString(reader["AdditionalInfo"]),
                             };
                             Errors.Add(Error);
                         }
@@ -143,9 +112,9 @@ namespace Log_system.Services
             return Errors;
         }
 
-        public List<LogData> FindErrorsByIdAndDate(int HotelId, DateTime StartDate, DateTime EndDate)
+        public List<LogError> FindErrorsByIdAndDate(int HotelId, DateTime StartDate, DateTime EndDate)
         {
-            List<LogData> Errors = new List<LogData>();
+            List<LogError> Errors = new List<LogError>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
@@ -155,7 +124,8 @@ namespace Log_system.Services
                         @"SELECT
                             HotelId,
                             Error,
-                            Date
+                            Date,
+                            AdditionalInfo
                         FROM ErrorData
                         WHERE HotelId = @hotelId AND Date >= @startDate AND Date <= @endDate";
 
@@ -167,11 +137,12 @@ namespace Log_system.Services
                     {
                         while (reader.Read())
                         {
-                            var Error = new LogData
+                            var Error = new LogError
                             {
                                 HotelId = Convert.ToInt32(reader["HotelId"]),
                                 Error = Convert.ToString(reader["Error"]),
-                                TimeRecieve = Convert.ToDateTime(reader["Date"]),
+                                CreationDateTime = Convert.ToDateTime(reader["Date"]),
+                                AdditionalInfo = Convert.ToString(reader["AdditionalInfo"]),
                             };
                             Errors.Add(Error);
                         }
